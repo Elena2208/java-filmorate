@@ -1,20 +1,28 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-@Data
+
+@Getter
+@With
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class User {
-    private final int id;
-    @NotEmpty(message ="Email cannot be empty." )
+
+    int id;
+    @NotEmpty(message = "Email cannot be empty.")
     @Email(message = "Invalid email format.")
-    private final String email;
-    @NotEmpty(message ="Login cannot be empty."  )
-    private final String login;
-    private final String name;
+    String email;
+    @NotEmpty(message = "Login cannot be empty.")
+    String login;
+
+    String name;
     @Past
-    private final LocalDate birthday;
+    LocalDate birthday;
+
+
 }

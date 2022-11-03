@@ -4,36 +4,57 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+
 @Validated
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(User.class);
-    private Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    public UserController() {
+        this.userService = new UserService();
+    }
 
     @GetMapping
     public Collection<User> findAll() {
-        return users.values();
+        return userService.getAllUsers();
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
+        if (user.getName() == null) {
+            throw new ValidationException("Поле name не может отсутствовать.");}
+
+        User newUser = User.builder().id(user.getId()).email(user.getEmail()).login(user.getLogin())
+                .name(user.getName()).birthday(user.getBirthday()).build();
+        if (user.getName().isEmpty() || user.getName().isBlank()) {
+            newUser = User.builder().id(user.getId()).email(user.getEmail()).login(user.getLogin())
+                    .name(user.getLogin()).birthday(user.getBirthday()).build();
+        }
+        if (newUser.getLogin().contains(" ")) {
+            throw new ValidationException("Login cannot contain spaces.");
+        }
         log.info("New user object has been created.");
-        users.put(user.getId(), user);
-        return user;
+        return userService.create(newUser);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            log.info("Updated the user object.");
-            users.replace(user.getId(), user);
+
+        User newUser = User.builder().id(user.getId()).email(user.getEmail()).login(user.getLogin())
+                .name(user.getName()).birthday(user.getBirthday()).build();
+
+        if (newUser.getLogin().contains(" ")) {
+            throw new ValidationException("Login cannot contain spaces.");
         }
-        return user;
+        log.info("Updated the user object.");
+        return userService.update(newUser);
     }
 }
