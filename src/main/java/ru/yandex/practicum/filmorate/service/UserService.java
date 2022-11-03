@@ -18,7 +18,10 @@ public class UserService {
 
     public User create(User user)
     {
-        User newUser =user.withId(getIdInc());
+        String name;
+        if (user.getName() == null || user.getName().isBlank()) {name=user.getLogin();}
+        else {name=user.getName();}
+        User newUser =user.withId(getIdInc()).withName(name);
         users.put(newUser.getId(),newUser);
         return newUser;
     }
@@ -26,7 +29,7 @@ public class UserService {
     public User update(User user)
     {
         if (!users.containsKey(user.getId())) {
-            throw new ResponseException("Пользователь  с id "+user.getId()+"не найден");
+            throw new ResponseException("Пользователь  с id "+user.getId()+" не найден");
         }
         users.put(user.getId(), user);
         return user;

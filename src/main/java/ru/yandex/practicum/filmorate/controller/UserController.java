@@ -29,15 +29,8 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        if (user.getName() == null) {
-            throw new ValidationException("Поле name не может отсутствовать.");}
-
-        User newUser = User.builder().id(user.getId()).email(user.getEmail()).login(user.getLogin())
+        User newUser= User.builder().id(user.getId()).email(user.getEmail()).login(user.getLogin())
                 .name(user.getName()).birthday(user.getBirthday()).build();
-        if (user.getName().isEmpty() || user.getName().isBlank()) {
-            newUser = User.builder().id(user.getId()).email(user.getEmail()).login(user.getLogin())
-                    .name(user.getLogin()).birthday(user.getBirthday()).build();
-        }
         if (newUser.getLogin().contains(" ")) {
             throw new ValidationException("Login cannot contain spaces.");
         }

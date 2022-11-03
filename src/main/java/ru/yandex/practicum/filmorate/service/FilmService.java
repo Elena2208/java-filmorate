@@ -23,7 +23,7 @@ public class FilmService {
     }
     public Film updateFilm(Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new ResponseException("Фильм с id "+film.getId()+"не найден");
+            throw new ResponseException("Фильм с id "+film.getId()+" не найден");
         }
         films.put(film.getId(), film);
         return film;
