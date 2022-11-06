@@ -17,19 +17,35 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
-        Film newFilm = film.withId(getIdInc());
-        films.put(newFilm.getId(), newFilm);
-        return newFilm;
+        Film newFilm = Film.builder()
+                .id(film.getId())
+                .name(film.getName())
+                .description(film.getDescription())
+                .releaseDate(film.getReleaseDate())
+                .duration(film.getDuration())
+                .build();
+        Film objectFilm = newFilm.withId(getIdInc());
+        films.put(objectFilm.getId(), objectFilm);
+        return objectFilm;
     }
+
     public Film updateFilm(Film film) {
-        if (!films.containsKey(film.getId())) {
-            throw new ResponseException("Фильм с id "+film.getId()+" не найден");
+        Film newFilm = Film.builder()
+                .id(film.getId())
+                .name(film.getName())
+                .description(film.getDescription())
+                .releaseDate(film.getReleaseDate())
+                .duration(film.getDuration())
+                .build();
+        Film objectFilm = newFilm.withId(getIdInc());
+        if (!films.containsKey(objectFilm.getId())) {
+            throw new ResponseException("Фильм с id " + objectFilm.getId() + " не найден");
         }
-        films.put(film.getId(), film);
-        return film;
+        films.put(objectFilm.getId(), objectFilm);
+        return objectFilm;
     }
-    private int getIdInc()
-    {
+
+    private int getIdInc() {
         return ++id;
     }
 }

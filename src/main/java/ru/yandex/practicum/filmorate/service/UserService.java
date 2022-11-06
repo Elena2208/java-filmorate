@@ -16,26 +16,39 @@ public class UserService {
         return new ArrayList<>(users.values());
     }
 
-    public User create(User user)
-    {
+    public User create(User user) {
+        User newUser = User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .login(user.getLogin())
+                .name(user.getName())
+                .birthday(user.getBirthday())
+                .build();
         String name;
-        if (user.getName() == null || user.getName().isBlank()) {name=user.getLogin();}
-        else {name=user.getName();}
-        User newUser =user.withId(getIdInc()).withName(name);
-        users.put(newUser.getId(),newUser);
+        if (newUser.getName() == null || newUser.getName().isBlank()) {
+            name = newUser.getLogin();
+        } else {
+            name = newUser.getName();
+        }
+        User objectUser = newUser.withId(getIdInc()).withName(name);
+        users.put(objectUser.getId(), objectUser);
+        return objectUser;
+    }
+    public User update(User user) {
+        User newUser = User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .login(user.getLogin())
+                .name(user.getName())
+                .birthday(user.getBirthday())
+                .build();
+        if (!users.containsKey(newUser.getId())) {
+            throw new ResponseException("Пользователь  с id " + newUser.getId() + " не найден");
+        }
+        users.put(newUser.getId(), newUser);
         return newUser;
     }
-
-    public User update(User user)
-    {
-        if (!users.containsKey(user.getId())) {
-            throw new ResponseException("Пользователь  с id "+user.getId()+" не найден");
-        }
-        users.put(user.getId(), user);
-        return user;
-    }
-    private int getIdInc(){
+    private int getIdInc() {
         return ++id;
     }
-
 }

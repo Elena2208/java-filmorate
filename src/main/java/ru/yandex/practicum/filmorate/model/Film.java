@@ -14,18 +14,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class Film {
-
-
-    int id;
+    private int id;
     @NotEmpty(message = "The field cannot be empty.")
-     String name;
-    @Size(max=200, message = "The description must be less than 200 characters.")
-    String description;
+    private String name;
+    @Size(max = 200, message = "The description must be less than 200 characters.")
+    private String description;
     @NotNull(message = "The date cannot be null.")
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
     @Positive(message = "The duration cannot be negative.")
-    Long duration;
-
-
-
+    private Long duration;
 }

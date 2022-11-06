@@ -5,25 +5,19 @@ import lombok.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-
 @Getter
 @With
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class User {
-
-    int id;
+    private int id;
     @NotEmpty(message = "Email cannot be empty.")
     @Email(message = "Invalid email format.")
-    String email;
+    private String email;
     @NotEmpty(message = "Login cannot be empty.")
-    String login;
-
-    String name;
+    private String login;
+    private String name;
     @Past
-    LocalDate birthday;
-
-
-
+    private LocalDate birthday;
 }
