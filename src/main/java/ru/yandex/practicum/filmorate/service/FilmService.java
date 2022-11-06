@@ -37,12 +37,12 @@ public class FilmService {
                 .releaseDate(film.getReleaseDate())
                 .duration(film.getDuration())
                 .build();
-        Film objectFilm = newFilm.withId(getIdInc());
-        if (!films.containsKey(objectFilm.getId())) {
-            throw new ResponseException("Фильм с id " + objectFilm.getId() + " не найден");
+
+        if (!films.containsKey(newFilm.getId())) {
+            throw new ResponseException("Фильм с id " + newFilm.getId() + " не найден");
         }
-        films.put(objectFilm.getId(), objectFilm);
-        return objectFilm;
+        films.put(newFilm.getId(), newFilm);
+        return newFilm;
     }
 
     private int getIdInc() {
