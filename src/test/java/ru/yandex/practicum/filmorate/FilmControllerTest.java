@@ -16,7 +16,7 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmNotNameTest() {
-        Film newFilm = new Film(1, "", "discription", LocalDate.now(), 120L);
+        Film newFilm = new Film("","125",LocalDate.now(),120L);
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
         ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
@@ -27,7 +27,7 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmTest() {
-        Film newFilm = new Film(1, "Name", "description", LocalDate.now(), 120L);
+        Film newFilm = new Film("name","125",LocalDate.now(),120L);
         boolean isValid = false;
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
@@ -39,15 +39,12 @@ public class FilmControllerTest {
 
     @Test
     public  void createFilmByDescriptionSize200Test() {
-        Film newFilm = new Film(1, "Film",
-                "*********************************************************************************************" +
-                        "************************************************************************************************" +
-                        "******************************************************************************************" +
-                        "*************************************************************************************" +
-                        "********************************************************************************" +
-                        "********************************************************************************" +
-                        "********************************************************************************" +
-                        "*******************************************************************************", LocalDate.now(), 120L);
+        Film newFilm = new Film("name","125***************************************" +
+                "***************************************************************************************************" +
+                "**************************************************************************************************" +
+                "**********************************************************************************************" +
+                "**************************************************************************************************" +
+                "************************************************************",LocalDate.now(),120L);
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
         ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
@@ -57,7 +54,7 @@ public class FilmControllerTest {
 
     @Test
     public  void createFilmNotReleaseDateTest() {
-        Film newFilm = new Film(1, "Name", "discription", null, 120L);
+        Film newFilm = new Film("name","125",null,120L);
         Validator validator =Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
         ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
@@ -67,7 +64,7 @@ public class FilmControllerTest {
 
     @Test
     public  void createFilmNegativeDurationTest() {
-        Film newFilm = new Film(1, "Name", "discription", LocalDate.now(), -120L);
+        Film newFilm = new Film("Name", "discription", LocalDate.now(), -120L);
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
         ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));

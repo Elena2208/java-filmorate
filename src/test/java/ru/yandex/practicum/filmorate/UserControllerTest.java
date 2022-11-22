@@ -15,7 +15,7 @@ public class UserControllerTest {
     @Test
     public void createUserTest() {
         boolean isValid = false;
-        User user = new User(1, "email@yandex.ru", "elena_1990", "elena",
+        User user = new User( "email@yandex.ru", "elena_1990",
                 LocalDate.of(1990, 8, 22));
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -27,7 +27,7 @@ public class UserControllerTest {
 
     @Test
     public void createUserByEmptyEmail() {
-        User user = new User(1, "", "elena_1990", "elena",
+        User user = new User("", "hghghjgb",
                 LocalDate.of(1990, 8, 22));
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -39,7 +39,7 @@ public class UserControllerTest {
 
     @Test
     public void createUserIncorrectEmailTest() {
-        User user = new User(1, "96-*/+-59", "elena_1990", "elena",
+        User user = new User("96-*/+-59", "elena_1990",
                 LocalDate.of(1990, 8, 22));
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -50,7 +50,7 @@ public class UserControllerTest {
 
     @Test
     public void createUserByEmptyLoginTest() {
-        User user = new User(1, "email@yandex.ru", "", "elena",
+        User user = new User("email@yandex.ru", "",
                 LocalDate.of(1990, 8, 22));
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -63,7 +63,7 @@ public class UserControllerTest {
     @Test
     public void createUserIncorrectDateTest() {
         boolean isValid = false;
-        User user = new User(1, "email@yandex.ru", "elena_1990", "elena",
+        User user = new User("email@yandex.ru", "elena_1990",
                 LocalDate.of(2023, 8, 22));
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<User>> violations = validator.validate(user);
