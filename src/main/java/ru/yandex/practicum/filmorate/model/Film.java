@@ -2,25 +2,26 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
-@Getter
-@With
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@Data
 public class Film {
+    private Set<Integer> usersLikes = new HashSet<>();
+
+    @PositiveOrZero
     private int id;
-    @NotEmpty(message = "The field cannot be empty.")
-    private String name;
-    @Size(max = 200, message = "The description must be less than 200 characters.")
-    private String description;
-    @NotNull(message = "The date cannot be null.")
-    private LocalDate releaseDate;
-    @Positive(message = "The duration cannot be negative.")
-    private Long duration;
+    @NotBlank(message = "Не правильное название фильма")
+    private final String name;
+    @NotNull(message = "Отсутствует описание фильма")
+    @Size(max = 200, message = "слишком длинное описание, больше 200 символов")
+    private final String description;
+    @NotNull
+    private final LocalDate releaseDate;
+    @Min(value = 1, message = "Неправильная продолжительность фильма")
+    @Positive
+    private final long duration;
+
 }

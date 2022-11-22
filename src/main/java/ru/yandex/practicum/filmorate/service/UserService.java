@@ -1,54 +1,94 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.exception.ResponseException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
 public class UserService {
-    private int id = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserStorage userStorage;
 
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
+    public Collection<User> findAll() {
+        return userStorage.findAll();
     }
 
     public User create(User user) {
-        User newUser = User.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .login(user.getLogin())
-                .name(user.getName())
-                .birthday(user.getBirthday())
-                .build();
-        String name;
-        if (newUser.getName() == null || newUser.getName().isBlank()) {
-            name = newUser.getLogin();
-        } else {
-            name = newUser.getName();
-        }
-        User objectUser = newUser.withId(getIdInc()).withName(name);
-        users.put(objectUser.getId(), objectUser);
-        return objectUser;
+        return userStorage.create(user);
     }
+
     public User update(User user) {
-        User newUser = User.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .login(user.getLogin())
-                .name(user.getName())
-                .birthday(user.getBirthday())
-                .build();
-        if (!users.containsKey(newUser.getId())) {
-            throw new ResponseException("Пользователь  с id " + newUser.getId() + " не найден");
-        }
-        users.put(newUser.getId(), newUser);
-        return newUser;
+        return userStorage.update(user);
     }
-    private int getIdInc() {
-        return ++id;
+
+    public User getById(int id) {
+        if (!userStorage.getUsers().containsKey(id)) {
+            throw new NotFoundException("User not found.");
+        }
+        return userStorage.getById(id);
+    }
+
+    public User deleteById(int id) {
+        if (!userStorage.getUsers().containsKey(id)) {
+            throw new NotFoundException("User not found.");
+        }
+        return userStorage.deleteById(id);
+    }
+
+    public List<User> addFriend(int firstId, int secondId) {
+        if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
+            throw new NotFoundException("User not found.");
+        }
+        if (userStorage.getById(firstId).getFriends().contains(secondId)) {
+            throw new AlreadyExistsException("Users are already friends");
+        }
+        userStorage.getById(firstId).getFriends().add(secondId);
+        userStorage.getById(secondId).getFriends().add(firstId);
+        return Arrays.asList(userStorage.getById(firstId), userStorage.getById(secondId));
+    }
+
+    public List<User> deleteFriend(int firstId, int secondId) {
+        if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
+            throw new NotFoundException("User not found.");
+        }
+        if (!userStorage.getById(firstId).getFriends().contains(secondId)) {
+            throw new AlreadyExistsException("Users are not friends.");
+        }
+        userStorage.getById(firstId).getFriends().remove(secondId);
+        userStorage.getById(secondId).getFriends().remove(firstId);
+        return Arrays.asList(userStorage.getById(firstId), userStorage.getById(secondId));
+    }
+
+    public List<User> getFriendsListById(int id) {
+        if (!userStorage.getUsers().containsKey(id)) {
+            throw new NotFoundException("User not found.");
+        }
+        return userStorage.getById(id).getFriends()
+                .stream()
+                .map(userStorage::getById)
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getCommonFriendsList(int firstId, int secondId) {
+        if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
+            throw new NotFoundException("User not found.");
+        }
+        User user = userStorage.getById(firstId);
+        User otherUser = userStorage.getById(secondId);
+        return user.getFriends().stream()
+                .filter(friendId -> otherUser.getFriends().contains(friendId))
+                .map(userStorage::getById)
+                .collect(Collectors.toList());
     }
 }
