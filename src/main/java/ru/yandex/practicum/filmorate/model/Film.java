@@ -13,14 +13,14 @@ public class Film {
 
     @PositiveOrZero
     private int id;
-    @NotBlank(message = "Не правильное название фильма")
+    @NotBlank(message = "Отсутствует название фильма")
     private final String name;
     @NotNull(message = "Отсутствует описание фильма")
-    @Size(max = 200, message = "слишком длинное описание, больше 200 символов")
+    @Size(max = 200, message = "Описание фильма не более 200 знаков")
     private final String description;
     @NotNull
     private final LocalDate releaseDate;
-    @Min(value = 1, message = "Неправильная продолжительность фильма")
+    @Min(value = 1, message = "Продолжительность фильма положительное значение")
     @Positive
     private final long duration;
 
