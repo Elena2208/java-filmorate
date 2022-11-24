@@ -9,8 +9,6 @@ import java.util.Set;
 
 @Data
 public class Film {
-    private Set<Integer> usersLikes = new HashSet<>();
-
     @PositiveOrZero
     private int id;
     @NotBlank(message = "Отсутствует название фильма")
@@ -23,5 +21,5 @@ public class Film {
     @Min(value = 1, message = "Продолжительность фильма положительное значение")
     @Positive
     private final long duration;
-
+    private Set<Integer> usersLikes = new HashSet<>();
 }

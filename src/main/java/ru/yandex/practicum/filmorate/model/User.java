@@ -9,8 +9,6 @@ import java.util.Set;
 
 @Data
 public class User {
-
-    private Set<Integer> friends = new HashSet<>();
     @PositiveOrZero
     private int id;
     @NotBlank(message = "Отсутствует email")
@@ -23,4 +21,5 @@ public class User {
     @NotNull(message = "Не указана дата рождения")
     @Past(message = "Некорректная дата рождения")
     private final LocalDate birthday;
+    private Set<Integer> friends = new HashSet<>();
 }

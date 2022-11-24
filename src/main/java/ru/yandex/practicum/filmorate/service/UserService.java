@@ -19,33 +19,27 @@ public class UserService {
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
-
     public Collection<User> findAll() {
         return userStorage.findAll();
     }
-
     public User create(User user) {
         return userStorage.create(user);
     }
-
     public User update(User user) {
         return userStorage.update(user);
     }
-
     public User getById(int id) {
         if (!userStorage.getUsers().containsKey(id)) {
             throw new NotFoundException("User not found.");
         }
         return userStorage.getById(id);
     }
-
     public User deleteById(int id) {
         if (!userStorage.getUsers().containsKey(id)) {
             throw new NotFoundException("User not found.");
         }
         return userStorage.deleteById(id);
     }
-
     public List<User> addFriend(int firstId, int secondId) {
         if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
             throw new NotFoundException("User not found.");
@@ -69,7 +63,6 @@ public class UserService {
         userStorage.getById(secondId).getFriends().remove(firstId);
         return Arrays.asList(userStorage.getById(firstId), userStorage.getById(secondId));
     }
-
     public List<User> getFriendsListById(int id) {
         if (!userStorage.getUsers().containsKey(id)) {
             throw new NotFoundException("User not found.");
@@ -79,7 +72,6 @@ public class UserService {
                 .map(userStorage::getById)
                 .collect(Collectors.toList());
     }
-
     public List<User> getCommonFriendsList(int firstId, int secondId) {
         if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
             throw new NotFoundException("User not found.");
