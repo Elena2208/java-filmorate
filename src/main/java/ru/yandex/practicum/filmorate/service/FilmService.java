@@ -16,37 +16,44 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+
     @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
+
     public Collection<Film> findAll() {
         return filmStorage.findAll();
     }
+
     public Film create(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Release date earlier than 28.12.1895.");
         }
         return filmStorage.create(film);
     }
+
     public Film update(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Release date earlier than 28.12.1895.");
         }
         return filmStorage.update(film);
     }
+
     public Film getById(int id) {
         if (!filmStorage.getFilms().containsKey(id)) {
             throw new NotFoundException("The movie was not found.");
         }
         return filmStorage.getById(id);
     }
+
     public Film deleteById(int id) {
         if (!filmStorage.getFilms().containsKey(id)) {
             throw new NotFoundException("The movie was not found.");
         }
         return filmStorage.deleteById(id);
     }
+
     public Film addLike(int filmId, int userId) {
         if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new NotFoundException("The movie was not found.");
@@ -54,6 +61,7 @@ public class FilmService {
         filmStorage.getById(filmId).getUsersLikes().add(userId);
         return filmStorage.getById(filmId);
     }
+
     public Film deleteLike(int filmId, int userId) {
         if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new NotFoundException("The movie was not found.");
@@ -64,6 +72,7 @@ public class FilmService {
         filmStorage.getById(filmId).getUsersLikes().remove(userId);
         return filmStorage.getById(filmId);
     }
+
     public List<Film> getPopularFilms(int count) {
         return filmStorage.findAll()
                 .stream()
