@@ -1,77 +1,44 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
+
 import java.time.LocalDate;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FilmControllerTest {
+    private FilmController controller;
 
-    @Test
-    public void createFilmNotNameTest() {
-        Film newFilm = new Film(1, "", "discription", LocalDate.now(), 120L);
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
-        ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("name", violation.getPropertyPath().toString());
-        assertEquals("The field cannot be empty.", violation.getMessageTemplate());
-    }
-
-
-    @Test
-    public void createFilmTest() {
-        Film newFilm = new Film(1, "Name", "description", LocalDate.now(), 120L);
-        boolean isValid = false;
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
-        if (violations.isEmpty()) {
-            isValid = true;
-        }
-        assertTrue(isValid);
+    @BeforeEach
+    void createController() {
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
     }
 
     @Test
-    public  void createFilmByDescriptionSize200Test() {
-        Film newFilm = new Film(1, "Film",
-                "*********************************************************************************************" +
-                        "************************************************************************************************" +
-                        "******************************************************************************************" +
-                        "*************************************************************************************" +
-                        "********************************************************************************" +
-                        "********************************************************************************" +
-                        "********************************************************************************" +
-                        "*******************************************************************************", LocalDate.now(), 120L);
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
-        ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("description", violation.getPropertyPath().toString());
-        assertEquals("The description must be less than 200 characters.", violation.getMessageTemplate());
+    void createFilm() {
+        Film film = new Film("name", "disko", LocalDate.of(2000, 2, 12), 120L);
+        controller.create(film);
+        assertEquals(1, controller.findAll().size());
     }
 
     @Test
-    public  void createFilmNotReleaseDateTest() {
-        Film newFilm = new Film(1, "Name", "discription", null, 120L);
-        Validator validator =Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
-        ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("releaseDate", violation.getPropertyPath().toString());
-        assertEquals("The date cannot be null.", violation.getMessageTemplate());
+    void deleteFilm() {
+        Film film = new Film("name", "disko", LocalDate.of(2000, 2, 12), 120L);
+        controller.create(film);
+        controller.deleteById(1);
+        assertEquals(0, controller.findAll().size());
     }
 
     @Test
-    public  void createFilmNegativeDurationTest() {
-        Film newFilm = new Film(1, "Name", "discription", LocalDate.now(), -120L);
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<Film>> violations = validator.validate(newFilm);
-        ConstraintViolation<Film> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("duration", violation.getPropertyPath().toString());
-        assertEquals("The duration cannot be negative.", violation.getMessageTemplate());
+    void getById() {
+        Film film = new Film("name", "disko", LocalDate.of(2000, 2, 12), 120L);
+        controller.create(film);
+        assertEquals(film, controller.getById(1));
     }
 }

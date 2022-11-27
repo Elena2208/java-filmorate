@@ -1,76 +1,47 @@
 package ru.yandex.practicum.filmorate;
 
-import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+
 import java.time.LocalDate;
-import java.util.Set;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserControllerTest {
-    @Test
-    public void createUserTest() {
-        boolean isValid = false;
-        User user = new User(1, "email@yandex.ru", "elena_1990", "elena",
-                LocalDate.of(1990, 8, 22));
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        if (violations.isEmpty()) {
-            isValid = true;
-        }
-        assertTrue(isValid);
+    private UserController controller;
+
+    @BeforeEach
+    void createController() {
+        controller = new UserController(new UserService(new InMemoryUserStorage()));
     }
 
     @Test
-    public void createUserByEmptyEmail() {
-        User user = new User(1, "", "elena_1990", "elena",
-                LocalDate.of(1990, 8, 22));
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        ConstraintViolation<User> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("email", violation.getPropertyPath().toString());
-        assertEquals("Email cannot be empty.", violation.getMessageTemplate());
-
+    void createUser() {
+        User user = new User("ele@yandex.ru", "elena", LocalDate.of(1990, 8, 22));
+        controller.create(user);
+        assertEquals(1, controller.findAll().size());
     }
 
     @Test
-    public void createUserIncorrectEmailTest() {
-        User user = new User(1, "96-*/+-59", "elena_1990", "elena",
-                LocalDate.of(1990, 8, 22));
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        ConstraintViolation<User> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("email", violation.getPropertyPath().toString());
-        assertEquals("Invalid email format.", violation.getMessageTemplate());
+    void deleteUser() {
+        User user = new User("ele@yandex.ru", "elena", LocalDate.of(1990, 8, 22));
+        controller.create(user);
+        controller.deleteById(1);
+        assertEquals(0, controller.findAll().size());
     }
 
     @Test
-    public void createUserByEmptyLoginTest() {
-        User user = new User(1, "email@yandex.ru", "", "elena",
-                LocalDate.of(1990, 8, 22));
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        ConstraintViolation<User> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        assertEquals("login", violation.getPropertyPath().toString());
-        assertEquals("Login cannot be empty.", violation.getMessageTemplate());
-
-    }
-
-    @Test
-    public void createUserIncorrectDateTest() {
-        boolean isValid = false;
-        User user = new User(1, "email@yandex.ru", "elena_1990", "elena",
-                LocalDate.of(2023, 8, 22));
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        ConstraintViolation<User> violation = violations.stream().findFirst().orElseThrow(() -> new RuntimeException(""));
-        if (user.getBirthday().isBefore(LocalDate.now())) {
-            isValid = true;
-        }
-        assertFalse(isValid);
+    void getById() {
+        User user = new User("ele@yandex.ru", "elena", LocalDate.of(1990, 8, 22));
+        User userTwo = new User("max@yandex.ru", "max", LocalDate.of(1989, 8, 1));
+        controller.create(user);
+        controller.create(userTwo);
+        assertEquals(userTwo, controller.getById(2));
     }
 }
