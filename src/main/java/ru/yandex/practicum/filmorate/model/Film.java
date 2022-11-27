@@ -4,7 +4,9 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -22,4 +24,6 @@ public class Film {
     @Positive
     private final long duration;
     private Set<Integer> usersLikes = new HashSet<>();
+    private List<Integer> ganres = new ArrayList<>();
+    private Integer ratingMPA;
 }

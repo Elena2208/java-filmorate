@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -25,7 +27,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
         containsUser(user);
@@ -39,7 +41,9 @@ public class InMemoryUserStorage implements UserStorage {
         if (!getUsers().containsKey(user.getId())) {
             throw new NotFoundException("User not found.");
         }
-        if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
+        if (StringUtils.isBlank(user.getName())) {
+            user.setName(user.getLogin());
+        }
         users.put(user.getId(), user);
         return user;
     }

@@ -22,4 +22,5 @@ public class User {
     @Past(message = "Некорректная дата рождения")
     private final LocalDate birthday;
     private Set<Integer> friends = new HashSet<>();
+    private boolean isFriend;
 }
