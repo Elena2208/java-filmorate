@@ -6,11 +6,14 @@ Template repository for Filmorate project.
 Примеры запросов к БД:
 
 Получить пользователя по идентефикатоу
-SELECT * from user
-FROM  friends 
-WHERE id = N
+SELECT * FROM users WHERE user_id = ?
 
-Получить фильм по идентификатору:
-SELECT * 
-FROM film
-WHERE id =  N
+Получить фильм по идентификатору
+Select * from films where film_id=?
+
+Удалить фильм 
+delete from films where film_id=?
+
+Добавить лайк фильму
+insert into likes(user_id,film_id) values (?,?)
+
