@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -23,7 +22,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class FilmDbStorageTest {
     private final FilmDbStorage filmDbStorage;
     private   final UserDbStorage userDbStorage;
@@ -62,7 +61,7 @@ public class FilmDbStorageTest {
     @Test
     void addFilmTest() {
         filmDbStorage.create(film);
-        Film newFilm = filmDbStorage.getById(1);
+        Film newFilm = filmDbStorage.getById((int) film.getId());
         assertThat(film).isEqualToComparingFieldByFieldRecursively(newFilm);
 
     }
@@ -70,7 +69,7 @@ public class FilmDbStorageTest {
     @Test
     void getByIdTest() {
         filmDbStorage.create(film);
-        Film newFilm = filmDbStorage.getById(1);
+        Film newFilm = filmDbStorage.getById((int) film.getId());
         assertThat(film).isEqualToComparingFieldByFieldRecursively(newFilm);
     }
 
@@ -97,8 +96,8 @@ public class FilmDbStorageTest {
     @Test
     void deleteById() {
         filmDbStorage.create(film);
-        filmDbStorage.deleteById(1);
-        Assertions.assertThatThrownBy(() -> filmDbStorage.getById(1))
+        filmDbStorage.deleteById((int) film.getId());
+        Assertions.assertThatThrownBy(() -> filmDbStorage.getById((int) film.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -108,9 +107,9 @@ public class FilmDbStorageTest {
         userDbStorage.create(user1);
         filmDbStorage.create(film2);
         userDbStorage.create(user2);
-        filmDbStorage.addLike(1,1);
-        filmDbStorage.addLike(1,2);
-        filmDbStorage.addLike(2,1);
+        filmDbStorage.addLike((int) film.getId(), (int) user1.getId());
+        filmDbStorage.addLike((int) film.getId(), (int) user2.getId());
+        filmDbStorage.addLike((int) film2.getId(), (int) user1.getId());
         filmDbStorage.getPopularFilms(2);
         AssertionsForClassTypes.assertThat(filmDbStorage.getPopularFilms(2).size()==2);
 
@@ -122,12 +121,12 @@ public class FilmDbStorageTest {
         userDbStorage.create(user1);
         filmDbStorage.create(film2);
         userDbStorage.create(user2);
-        filmDbStorage.addLike(1,1);
-        filmDbStorage.addLike(1,2);
-        filmDbStorage.addLike(2,1);
+        filmDbStorage.addLike((int) film.getId(), (int) user1.getId());
+        filmDbStorage.addLike((int) film.getId(), (int) user2.getId());
+        filmDbStorage.addLike((int) film2.getId(), (int) user1.getId());
         filmDbStorage.getPopularFilms(2);
         AssertionsForClassTypes.assertThat(filmDbStorage.getPopularFilms(2).size()==2);
-        filmDbStorage.deleteLike(2,1);
+        filmDbStorage.deleteLike((int) film2.getId(), (int) user1.getId());
         filmDbStorage.getPopularFilms(2);
         AssertionsForClassTypes.assertThat(filmDbStorage.getPopularFilms(2).size()==1);
     }
@@ -138,9 +137,9 @@ public class FilmDbStorageTest {
         userDbStorage.create(user1);
         filmDbStorage.create(film2);
         userDbStorage.create(user2);
-        filmDbStorage.addLike(1,1);
-        filmDbStorage.addLike(1,2);
-        filmDbStorage.addLike(2,1);
+        filmDbStorage.addLike((int) film.getId(), (int) user1.getId());
+        filmDbStorage.addLike((int) film.getId(), (int) user2.getId());
+        filmDbStorage.addLike((int) film2.getId(), (int) user1.getId());
         filmDbStorage.getPopularFilms(2);
         AssertionsForClassTypes.assertThat(filmDbStorage.getPopularFilms(2).size()==2);
     }

@@ -21,7 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserDbStorageTest {
     private final UserDbStorage userDbStorage;
     final User user1 = User.builder()
@@ -47,14 +47,13 @@ public class UserDbStorageTest {
     @Test
     void createTest() {
         userDbStorage.create(user1);
-        User userNew = userDbStorage.getById(1);
-        assertThat(user1).isEqualToComparingFieldByFieldRecursively(userNew);
+        assertThat(userDbStorage.findAll().size()==1);
     }
 
     @Test
     void getById() {
         userDbStorage.create(user1);
-        User userNew = userDbStorage.getById(1);
+        User userNew = userDbStorage.getById((int) user1.getId());
         assertThat(user1).isEqualToComparingFieldByFieldRecursively(userNew);
     }
 
@@ -78,8 +77,8 @@ public class UserDbStorageTest {
     @Test
     void deleteById() {
         userDbStorage.create(user1);
-        userDbStorage.deleteById(1);
-        Assertions.assertThatThrownBy(() -> userDbStorage.getById(1))
+        userDbStorage.deleteById((int) user1.getId());
+        Assertions.assertThatThrownBy(() -> userDbStorage.getById((int) user1.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 
