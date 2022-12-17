@@ -16,6 +16,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -26,12 +27,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findAll() {
-        String sqlQuery = "select films.FILM_ID,films.NAME,films.DESCRIPTION, " +
+        String sqlQuery = "select films.FILM_ID, films.NAME, films.DESCRIPTION, " +
                 " films.RELEASE_DATE, films.DURATION, films.mpa_id, mpa.mpa_name from films " +
-                " join MPA ON films.mpa_id=mpa.mpa_id order by film_id";
+                " join MPA ON films.mpa_id = mpa.mpa_id order by film_id";
+        log.info("Список фильмов отправлен.");
         return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
-
 
     @Override
     public Film create(Film film) {
@@ -56,14 +57,15 @@ public class FilmDbStorage implements FilmStorage {
         }
         film.setMpa(findMpa((int) film.getId()));
         film.setGenres(findGenres((int) film.getId()));
+        log.info("Создан объект Фильм.");
         return film;
     }
 
     @Override
     public Film update(Film film) {
-
         SqlRowSet rs = jdbcTemplate.queryForRowSet("Select * from films where film_id=?", film.getId());
         if (!rs.next()) {
+            log.warn("Объект не найден.");
             throw new NotFoundException("Фильм не найден.");
         }
 
@@ -81,6 +83,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(), film.getId());
         film.setMpa(findMpa((int) film.getId()));
         film.setGenres(findGenres((int) film.getId()));
+        log.info("Фильм обновлен.");
         return film;
     }
 
@@ -88,8 +91,10 @@ public class FilmDbStorage implements FilmStorage {
     public Film getById(int id) {
         SqlRowSet rs = jdbcTemplate.queryForRowSet("Select * from films where film_id=?", id);
         if (!rs.next()) {
+            log.warn("Объект не найден.");
             throw new NotFoundException("Фильм не найден.");
         }
+        log.info("Отправлен объект Фильм.");
         return jdbcTemplate.queryForObject("select films.FILM_ID,films.NAME,films.DESCRIPTION,films.RELEASE_DATE,"
                         + "films.DURATION, films.mpa_id, mpa.mpa_name from films join MPA ON films.mpa_id=mpa.mpa_id " +
                         "where films.film_id=?",
@@ -132,6 +137,7 @@ public class FilmDbStorage implements FilmStorage {
         SqlRowSet sqlFilm = jdbcTemplate.queryForRowSet("SELECT * FROM films where film_id=?", filmId);
         SqlRowSet sqlUser = jdbcTemplate.queryForRowSet("SELECT * FROM users where user_id=?", userId);
         if (!sqlFilm.next() || !sqlUser.next()) {
+            log.warn("Объекты не найдены.");
             throw new NotFoundException("Объекты не найдены.");
         }
     }
@@ -159,10 +165,14 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film makeFilm(ResultSet resultSet, int i) throws SQLException {
+        LocalDate releaseDate = resultSet.getDate("release_date").toLocalDate();
+        if (releaseDate == null) {
+            releaseDate = LocalDate.of(2000, 1, 1);
+        }
         int id = resultSet.getInt("film_id");
         return new Film(id, resultSet.getString("name"),
                 resultSet.getString("description"),
-                resultSet.getDate("release_date").toLocalDate(),
+                releaseDate,
                 resultSet.getLong("duration"),
                 new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("mpa_name")),
                 findGenres(id));

@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class MpaDbStorage implements MpaStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override
