@@ -29,11 +29,10 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public List<Mpa> getAll() {
-        return    jdbcTemplate.query("select * from mpa", this::makeMpa);
+        return jdbcTemplate.query("select * from mpa", this::makeMpa);
     }
 
     private Mpa makeMpa(ResultSet resultSet, int rowNum) throws SQLException {
-        return new Mpa(resultSet.getInt("mpa_id"),
-                resultSet.getString("mpa_name"));
+        return new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("mpa_name"));
     }
 }

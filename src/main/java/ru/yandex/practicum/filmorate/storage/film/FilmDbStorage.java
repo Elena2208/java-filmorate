@@ -82,7 +82,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setMpa(findMpa((int) film.getId()));
         film.setGenres(findGenres((int) film.getId()));
         return film;
-
     }
 
     @Override
@@ -99,25 +98,21 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void deleteById(int id) {
-
         jdbcTemplate.update("delete from FILM_GENRES where film_id=?", id);
         jdbcTemplate.update("delete from likes where film_id=?", id);
         jdbcTemplate.update("delete from films where film_id=?", id);
-
     }
 
     @Override
     public void addLike(int filmId, int userId) {
         containsId(filmId, userId);
         jdbcTemplate.update("insert into likes(user_id,film_id) values (?,?)", userId, filmId);
-
     }
 
     @Override
     public void deleteLike(int filmId, int userId) {
         containsId(filmId, userId);
         jdbcTemplate.update("delete from likes where user_id=? and film_id=?", userId, filmId);
-
     }
 
     @Override
@@ -130,10 +125,7 @@ public class FilmDbStorage implements FilmStorage {
                 "group by f.FILM_ID " +
                 "order by count(l.USER_ID) desc " +
                 "limit ?";
-
-
         return jdbcTemplate.query(sqlQuery, this::makeFilm, count);
-
     }
 
     private void containsId(int filmId, int userId) {
@@ -153,7 +145,6 @@ public class FilmDbStorage implements FilmStorage {
         while (rs.next()) {
             genres.add(new Genre(rs.getInt("genre_id"), rs.getString("genre_name")));
         }
-
         return genres;
     }
 
@@ -176,5 +167,4 @@ public class FilmDbStorage implements FilmStorage {
                 new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("mpa_name")),
                 findGenres(id));
     }
-
 }

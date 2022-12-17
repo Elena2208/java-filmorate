@@ -15,7 +15,6 @@ public class User {
     private long id;
     @NotBlank(message = "Отсутствует email")
     @Email(message = "Некорректный email")
-    @Email
     private  String email;
     @NotNull(message = "Отсутствует логин")
     private  String login;

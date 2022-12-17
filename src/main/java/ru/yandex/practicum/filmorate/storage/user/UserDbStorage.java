@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -24,17 +25,15 @@ import java.util.*;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-
     @Override
     public Collection<User> findAll() {
-
         final String sqlQuery = "SELECT * FROM users";
         return jdbcTemplate.query(sqlQuery, this::makeUser);
     }
 
     @Override
     public User create(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
         final String sqlQuery = "INSERT INTO users (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES ( ?, ?, ?, ?)";
@@ -54,7 +53,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (StringUtils.isBlank(user.getName())) {
             user.setName(user.getLogin());
         }
         final String checkQuery = "SELECT * FROM users WHERE user_id = ?";
@@ -64,9 +63,7 @@ public class UserDbStorage implements UserStorage {
             log.warn("Пользователь с id {} не найден", user.getId());
             throw new NotFoundException("Пользователь не найден");
         }
-
         final String sqlQuery = "UPDATE users SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE user_id = ?";
-
         jdbcTemplate.update(sqlQuery,
                 user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         log.info("Пользователь {} обновлен", user.getId());
@@ -81,9 +78,7 @@ public class UserDbStorage implements UserStorage {
             log.warn("Пользователь с идентификатором {} не найден.", id);
             throw new NotFoundException("Пользователь не найден");
         }
-
         final String checkQuery = "select * from users where user_id = ?";
-
         log.info("Пользователь с id {} отправлен", id);
         return jdbcTemplate.queryForObject(checkQuery, this::makeUser, id);
     }
@@ -122,23 +117,12 @@ public class UserDbStorage implements UserStorage {
             throw new NotFoundException("Пользователь не найден.");
         }
         jdbcTemplate.update("delete from friends where user_id=? and friend_id=?", firstId, secondId);
-
-
     }
 
     @Override
     public List<User> getFriendsListById(int id) {
-        List<User> users = new ArrayList<>();
-        SqlRowSet rs = jdbcTemplate.queryForRowSet("SELECT * From USERS where USER_ID IN (SELECT FRIEND_ID FROM FRIENDS where USER_ID = ?)", id);
-        while (rs.next()) {
-            users.add(new User(rs.getLong("USER_ID"),
-                    rs.getString("EMAIL"),
-                    rs.getString("LOGIN"),
-                    rs.getString("NAME"),
-                    rs.getDate("BIRTHDAY").toLocalDate()));
-
-        }
-        return users;
+        String sqlQuery = "SELECT * From USERS where USER_ID IN (SELECT FRIEND_ID FROM FRIENDS where USER_ID = ?)";
+        return jdbcTemplate.query(sqlQuery, this::makeUser, id);
     }
 
     @Override
@@ -151,20 +135,9 @@ public class UserDbStorage implements UserStorage {
         if (!rs.next()) {
             throw new NotFoundException("Пользователь не найден.");
         }
-        List<User> users = new ArrayList<>();
-        rs = jdbcTemplate.queryForRowSet("SELECT * From USERS where USER_ID IN (SELECT FRIEND_ID FROM FRIENDS" +
-                " where USER_ID = ?) " +
-                "AND USER_ID IN (SELECT FRIEND_ID FROM FRIENDS where USER_ID =?)",firstId,secondId);
-        while (rs.next()) {
-            users.add(new User(rs.getLong("USER_ID"),
-                    rs.getString("EMAIL"),
-                    rs.getString("LOGIN"),
-                    rs.getString("NAME"),
-                    rs.getDate("BIRTHDAY").toLocalDate()));
-
-        }
-        return users;
-
+        String sqlQuery = "SELECT * From USERS where USER_ID IN (SELECT FRIEND_ID FROM FRIENDS where USER_ID = ?) " +
+                "AND USER_ID IN (SELECT FRIEND_ID FROM FRIENDS where USER_ID =?)";
+        return jdbcTemplate.query(sqlQuery, this::makeUser, firstId, secondId);
     }
 
     private User makeUser(ResultSet resultSet, int rowNum) throws SQLException {
